@@ -14,7 +14,7 @@ function App() {
     setAnalysis(null)
 
     try {
-      const response = await fetch('http://localhost:8080/api/recruiter/analyze', {
+      const response = await fetch('https://asistenteai-rayq.onrender.com/api/recruiter/analyze', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
