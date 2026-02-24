@@ -6,16 +6,22 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [analysis, setAnalysis] = useState(null)
   const [error, setError] = useState(null)
+  const [showHowToUse, setShowHowToUse] = useState(false)
 
   // Cerrar modal con tecla Escape y prevenir scroll del body
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape' && analysis) {
-        setAnalysis(null)
+      if (e.key === 'Escape') {
+        if (analysis) {
+          setAnalysis(null)
+        }
+        if (showHowToUse) {
+          setShowHowToUse(false)
+        }
       }
     }
     
-    if (analysis) {
+    if (analysis || showHowToUse) {
       document.addEventListener('keydown', handleEscape)
       document.body.style.overflow = 'hidden'
     } else {
@@ -26,7 +32,7 @@ function App() {
       document.removeEventListener('keydown', handleEscape)
       document.body.style.overflow = 'unset'
     }
-  }, [analysis])
+  }, [analysis, showHowToUse])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -74,6 +80,16 @@ function App() {
           <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
             Análisis inteligente de currículums con tecnología de inteligencia artificial
           </p>
+          {/* Botón Instrucciones - Centrado debajo del subtítulo */}
+          <button
+            onClick={() => setShowHowToUse(true)}
+            className="mt-4 inline-flex items-center gap-1.5 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-lg border border-indigo-600 hover:bg-indigo-700 hover:border-indigo-700 hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Instrucciones
+          </button>
         </div>
 
         {/* Form Card */}
@@ -161,7 +177,7 @@ function App() {
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Resultados del Análisis</h2>
                 <button
                   onClick={() => setAnalysis(null)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                  className="text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 p-2 rounded-lg hover:scale-110 active:scale-95 cursor-pointer"
                   aria-label="Cerrar"
                 >
                   <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -292,6 +308,49 @@ function App() {
                 ))}
               </ul>
             </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Instrucciones */}
+        {showHowToUse && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-fade-in"
+            onClick={() => setShowHowToUse(false)}
+          >
+            {/* Modal Content */}
+            <div 
+              className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-fade-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 sm:px-8 lg:px-10 py-4 flex items-center justify-between z-10">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Instrucciones</h2>
+                <button
+                  onClick={() => setShowHowToUse(false)}
+                  className="text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200 p-2 rounded-lg hover:scale-110 active:scale-95 cursor-pointer"
+                  aria-label="Cerrar"
+                >
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="p-6 sm:p-8 lg:p-10">
+                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-indigo-200">
+                  <div className="space-y-4 text-gray-700 leading-relaxed text-base">
+                    <p>
+                      Copia la información de un archivo tipo CV, o similar. Pégala dentro del apartado <strong className="text-indigo-700">Texto del CV</strong>.
+                    </p>
+                    <p>
+                      Luego en <strong className="text-indigo-700">Descripción del puesto</strong>, indica incluyendo los detalles que consideres importantes, ej: <em className="text-gray-600">Backend Java Developer Spring Boot + AI integration</em>.
+                    </p>
+                    <p>
+                      <strong className="text-indigo-700">Analiza</strong> y descubre si hay buen match.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
