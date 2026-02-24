@@ -355,6 +355,34 @@ function App() {
             </div>
           </div>
         )}
+
+        {/* Footer */}
+        <footer className="mt-16 pt-8 pb-6 border-t border-gray-200">
+          <div className="flex flex-col items-center gap-4">
+            <p className="text-sm text-gray-600">© Derechos reservados 2026</p>
+            <p className="text-sm text-gray-500">Desarrollado por Hernan Berrino</p>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://www.linkedin.com/in/hernanberrino/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-indigo-600 transition-colors duration-200 hover:scale-110 active:scale-95"
+                aria-label="LinkedIn"
+              >
+                <img src="/linkedin.svg" alt="LinkedIn" className="w-6 h-6" />
+              </a>
+              <a
+                href="https://github.com/hberrino"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-indigo-600 transition-colors duration-200 hover:scale-110 active:scale-95"
+                aria-label="GitHub"
+              >
+                <img src="/github.svg" alt="GitHub" className="w-6 h-6" />
+              </a>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   )
