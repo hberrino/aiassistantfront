@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function App() {
   const [cvText, setCvText] = useState('')
@@ -6,6 +6,27 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [analysis, setAnalysis] = useState(null)
   const [error, setError] = useState(null)
+
+  // Cerrar modal con tecla Escape y prevenir scroll del body
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && analysis) {
+        setAnalysis(null)
+      }
+    }
+    
+    if (analysis) {
+      document.addEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [analysis])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -31,6 +52,7 @@ function App() {
 
       const data = await response.json()
       setAnalysis(data)
+      // El modal se mostrará automáticamente cuando analysis tenga datos
     } catch (err) {
       setError(err.message || 'Error al conectar con el servidor')
     } finally {
@@ -39,40 +61,50 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold text-gray-800 text-center mb-8">
-          Asistente IA Reclutador
-        </h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        {/* Header */}
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="inline-block mb-4">
+            <div className="h-1 w-20 bg-gradient-to-r from-indigo-600 to-purple-600 mx-auto rounded-full"></div>
+          </div>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-3 tracking-tight">
+            Asistente IA Reclutador
+          </h1>
+          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
+            Análisis inteligente de currículums con tecnología de inteligencia artificial
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-xl p-6 mb-8">
-          <div className="space-y-6">
+        {/* Form Card */}
+        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 lg:p-10 mb-8 transition-shadow hover:shadow-xl">
+          <div className="space-y-8">
             <div>
-              <label htmlFor="cvText" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="cvText" className="block text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
                 Texto del CV
               </label>
               <textarea
                 id="cvText"
                 value={cvText}
                 onChange={(e) => setCvText(e.target.value)}
-                rows={8}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                placeholder="Pega aquí el contenido del CV..."
+                rows={10}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none transition-all text-gray-900 placeholder-gray-400 bg-gray-50 focus:bg-white"
+                placeholder="Ingrese el contenido completo del currículum vitae..."
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="jobDescription" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="jobDescription" className="block text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
                 Descripción del Puesto
               </label>
               <textarea
                 id="jobDescription"
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
-                rows={8}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                placeholder="Pega aquí la descripción del puesto de trabajo..."
+                rows={10}
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none transition-all text-gray-900 placeholder-gray-400 bg-gray-50 focus:bg-white"
+                placeholder="Ingrese la descripción detallada del puesto de trabajo..."
                 required
               />
             </div>
@@ -80,63 +112,125 @@ function App() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors disabled:bg-indigo-400 disabled:cursor-not-allowed"
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-8 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 active:scale-95 active:shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-300 transform hover:scale-[1.01] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
             >
-              {loading ? 'Analizando...' : 'Analizar CV'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Analizando...
+                </span>
+              ) : (
+                'Analizar CV'
+              )}
             </button>
           </div>
         </form>
 
+        {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-8">
-            <p className="font-medium">Error: {error}</p>
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 sm:p-6 rounded-lg mb-8 shadow-sm">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="font-semibold">Error</p>
+                <p className="mt-1 text-sm">{error}</p>
+              </div>
+            </div>
           </div>
         )}
 
+        {/* Modal Overlay */}
         {analysis && (
-          <div className="bg-white rounded-lg shadow-xl p-6 space-y-6">
-            <div className="border-b pb-4">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Resultados del Análisis</h2>
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <p className="text-sm text-gray-600 mb-1">Porcentaje de Coincidencia</p>
-                  <div className="w-full bg-gray-200 rounded-full h-4">
-                    <div
-                      className="bg-indigo-600 h-4 rounded-full transition-all duration-500 flex items-center justify-end pr-2"
-                      style={{ width: `${analysis.matchPercentage}%` }}
-                    >
-                      <span className="text-xs text-white font-semibold">
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 animate-fade-in"
+            onClick={() => setAnalysis(null)}
+          >
+            {/* Modal Content */}
+            <div 
+              className="bg-white rounded-2xl shadow-2xl border border-gray-200 w-full max-w-6xl max-h-[90vh] overflow-y-auto animate-fade-in"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 sm:px-8 lg:px-10 py-4 flex items-center justify-between z-10">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Resultados del Análisis</h2>
+                <button
+                  onClick={() => setAnalysis(null)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+                  aria-label="Cerrar"
+                >
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="p-6 sm:p-8 lg:p-10 space-y-8">
+                {/* Header with Match Percentage */}
+                <div className="border-b border-gray-200 pb-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-gray-600">Coincidencia</span>
+                      <span className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                         {analysis.matchPercentage}%
                       </span>
                     </div>
                   </div>
+                  <div className="space-y-2">
+                    <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner">
+                      <div
+                        className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 h-6 rounded-full transition-all duration-1000 ease-out flex items-center justify-end pr-3 shadow-sm"
+                        style={{ width: `${analysis.matchPercentage}%` }}
+                      >
+                        {analysis.matchPercentage > 20 && (
+                          <span className="text-xs text-white font-bold">
+                            {analysis.matchPercentage}%
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Resumen Profesional</h3>
-                <p className="text-gray-600 bg-gray-50 p-4 rounded-lg">
+            {/* Professional Summary and Seniority */}
+            <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="h-1 w-8 bg-blue-600 rounded-full"></div>
+                  Resumen Profesional
+                </h3>
+                <p className="text-gray-700 leading-relaxed text-base">
                   {analysis.professionalSummary}
                 </p>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Seniority Estimado</h3>
-                <p className="text-indigo-600 font-semibold text-xl bg-indigo-50 p-4 rounded-lg">
+              <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl p-6 border border-purple-100">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="h-1 w-8 bg-purple-600 rounded-full"></div>
+                  Seniority Estimado
+                </h3>
+                <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                   {analysis.estimatedSeniority}
                 </p>
               </div>
             </div>
 
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Habilidades Detectadas</h3>
-              <div className="flex flex-wrap gap-2">
+            {/* Skills */}
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="h-1 w-8 bg-indigo-600 rounded-full"></div>
+                Habilidades Detectadas
+              </h3>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {analysis.detectedSkills.map((skill, index) => (
                   <span
                     key={index}
-                    className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
+                    className="bg-white border-2 border-indigo-200 text-indigo-700 px-4 py-2 rounded-lg text-sm font-semibold shadow-sm hover:border-indigo-300 hover:shadow-md transition-all"
                   >
                     {skill}
                   </span>
@@ -144,42 +238,61 @@ function App() {
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold text-green-700 mb-3">Fortalezas</h3>
-                <ul className="space-y-2">
+            {/* Strengths and Gaps */}
+            <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="h-1 w-8 bg-green-600 rounded-full"></div>
+                  Fortalezas
+                </h3>
+                <ul className="space-y-3">
                   {analysis.strengths.map((strength, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-green-500 mt-1">✓</span>
-                      <span>{strength}</span>
+                    <li key={index} className="flex items-start gap-3 text-gray-700 bg-white/60 rounded-lg p-3 border border-green-100">
+                      <svg className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="flex-1">{strength}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div>
-                <h3 className="text-lg font-semibold text-orange-700 mb-3">Áreas de Mejora</h3>
-                <ul className="space-y-2">
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <div className="h-1 w-8 bg-amber-600 rounded-full"></div>
+                  Áreas de Mejora
+                </h3>
+                <ul className="space-y-3">
                   {analysis.gaps.map((gap, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-700">
-                      <span className="text-orange-500 mt-1">⚠</span>
-                      <span>{gap}</span>
+                    <li key={index} className="flex items-start gap-3 text-gray-700 bg-white/60 rounded-lg p-3 border border-amber-100">
+                      <svg className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <span className="flex-1">{gap}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
 
-            <div>
-              <h3 className="text-lg font-semibold text-indigo-700 mb-3">Recomendaciones</h3>
-              <ul className="space-y-2 bg-indigo-50 p-4 rounded-lg">
+            {/* Recommendations */}
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-indigo-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <div className="h-1 w-8 bg-indigo-600 rounded-full"></div>
+                Recomendaciones
+              </h3>
+              <ul className="space-y-3">
                 {analysis.recommendations.map((recommendation, index) => (
-                  <li key={index} className="flex items-start gap-2 text-gray-700">
-                    <span className="text-indigo-500 mt-1">→</span>
-                    <span>{recommendation}</span>
+                  <li key={index} className="flex items-start gap-3 text-gray-700 bg-white rounded-lg p-4 border border-indigo-100 hover:border-indigo-200 transition-colors">
+                    <svg className="h-5 w-5 text-indigo-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                    <span className="flex-1 font-medium">{recommendation}</span>
                   </li>
                 ))}
               </ul>
+            </div>
+              </div>
             </div>
           </div>
         )}
