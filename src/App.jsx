@@ -7,6 +7,7 @@ function App() {
   const [analysis, setAnalysis] = useState(null)
   const [error, setError] = useState(null)
   const [showHowToUse, setShowHowToUse] = useState(false)
+  const [isDark, setIsDark] = useState(false)
 
   // Cerrar modal con tecla Escape y prevenir scroll del body
   useEffect(() => {
@@ -33,6 +34,18 @@ function App() {
       document.body.style.overflow = 'unset'
     }
   }, [analysis, showHowToUse])
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme')
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const shouldUseDark = savedTheme ? savedTheme === 'dark' : prefersDark
+    setIsDark(shouldUseDark)
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark)
+    localStorage.setItem('theme', isDark ? 'dark' : 'light')
+  }, [isDark])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -66,37 +79,131 @@ function App() {
     }
   }
 
+  const scrollToAnalyzer = () => {
+    const analyzerSection = document.getElementById('analysis-form')
+    if (analyzerSection) {
+      analyzerSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
+    <div className="min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        {/* Header */}
-        <div className="text-center mb-12 sm:mb-16">
-          <div className="inline-block mb-4">
-            <div className="h-1 w-20 bg-gradient-to-r from-indigo-600 to-purple-600 mx-auto rounded-full"></div>
+        {/* Hero / Landing */}
+        <section className="mb-12 sm:mb-16 rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 overflow-hidden dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/30">
+          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white px-6 py-4 sm:px-10 flex items-center justify-between gap-4">
+            <p className="text-sm sm:text-base font-medium tracking-wide text-slate-200">
+              IA aplicada a reclutamiento y evaluación de perfiles
+            </p>
+            <button
+              onClick={() => setIsDark((prev) => !prev)}
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-800/60 px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-100 hover:bg-slate-700 transition-colors cursor-pointer"
+              aria-label={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+            >
+              {isDark ? 'Modo claro' : 'Modo oscuro'}
+            </button>
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-3 tracking-tight">
-            Asistente IA Reclutador
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-            Análisis inteligente de currículums con tecnología de inteligencia artificial
-          </p>
-          {/* Botón Instrucciones - Centrado debajo del subtítulo */}
-          <button
-            onClick={() => setShowHowToUse(true)}
-            className="mt-4 inline-flex items-center gap-1.5 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium shadow-lg border border-indigo-600 hover:bg-indigo-700 hover:border-indigo-700 hover:shadow-xl transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
-          >
-            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Instrucciones
-          </button>
-        </div>
+          <div className="grid lg:grid-cols-5 gap-8 px-6 py-8 sm:px-10 sm:py-12">
+            <div className="lg:col-span-3">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4 tracking-tight">
+                Evaluacion profesional de CV con IA
+              </h1>
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
+                Copias el texto de tu CV, detallas el puesto y recibis un analisis preciso para tomar decisiones mas rapidas, con foco en seniority, fortalezas y brechas del perfil.
+              </p>
+
+              <div className="mt-6 grid sm:grid-cols-3 gap-3">
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">+50</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">CVs analizados</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">3 pasos</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">Proceso simple</p>
+                </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
+                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">IA</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300">Analisis estructurado</p>
+                </div>
+              </div>
+
+              <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <button
+                  onClick={scrollToAnalyzer}
+                  className="inline-flex items-center justify-center bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-md border border-slate-900 hover:bg-slate-800 transition-all duration-200 cursor-pointer dark:bg-white dark:text-slate-900 dark:border-white dark:hover:bg-slate-200"
+                >
+                  Empezar analisis
+                </button>
+                <button
+                  onClick={() => setShowHowToUse(true)}
+                  className="inline-flex items-center gap-2 bg-white text-slate-700 px-6 py-3 rounded-xl text-sm font-semibold border border-slate-300 hover:border-slate-500 hover:text-slate-900 transition-colors duration-200 cursor-pointer dark:bg-slate-800 dark:text-slate-100 dark:border-slate-600 dark:hover:border-slate-500"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Como funciona
+                </button>
+              </div>
+            </div>
+
+            <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-4">Que resultado esperar</h2>
+              <ul className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-slate-900"></span>
+                  <span>Porcentaje de coincidencia entre CV y puesto.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-slate-900"></span>
+                  <span>Estimacion de seniority y resumen profesional.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-slate-900"></span>
+                  <span>Habilidades detectadas, fortalezas y areas de mejora.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 h-2 w-2 rounded-full bg-slate-900"></span>
+                  <span>Recomendaciones accionables para mejorar el match.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Como funciona */}
+        <section className="mb-10 grid md:grid-cols-3 gap-4">
+          <article className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm dark:bg-slate-900 dark:border-slate-700">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Paso 1</p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2">Pegas tu CV</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300">Copia y pega el texto completo de tu currículum en el primer campo.</p>
+          </article>
+          <article className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm dark:bg-slate-900 dark:border-slate-700">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Paso 2</p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2">Detallas el puesto</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300">Especifica responsabilidades, stack y requisitos clave de la posicion.</p>
+          </article>
+          <article className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm dark:bg-slate-900 dark:border-slate-700">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Paso 3</p>
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2">Recibis analisis IA</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-300">Obtene un diagnostico claro para validar fit, seniority y mejoras.</p>
+          </article>
+        </section>
 
         {/* Form Card */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 lg:p-10 mb-8 transition-shadow hover:shadow-xl">
+        <form
+          id="analysis-form"
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 sm:p-8 lg:p-10 mb-8 transition-shadow hover:shadow-xl dark:bg-slate-900 dark:border-slate-700"
+        >
+          <div className="mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">Iniciar analisis</h2>
+            <p className="text-slate-600 dark:text-slate-300 mt-2">
+              Completá los campos y obtene una evaluacion precisa del perfil contra el puesto.
+            </p>
+          </div>
           <div className="space-y-8">
             <div>
-              <label htmlFor="cvText" className="block text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+              <label htmlFor="cvText" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3 uppercase tracking-wide">
                 Texto del CV
               </label>
               <textarea
@@ -104,14 +211,14 @@ function App() {
                 value={cvText}
                 onChange={(e) => setCvText(e.target.value)}
                 rows={10}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none transition-all text-gray-900 placeholder-gray-400 bg-gray-50 focus:bg-white"
-                placeholder="Ingrese el contenido completo del currículum vitae..."
+                className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-500 focus:border-slate-500 resize-none transition-all text-slate-900 placeholder-slate-400 bg-slate-50 focus:bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400 dark:focus:bg-slate-800"
+                placeholder="Ingrese el contenido completo del curriculum vitae..."
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="jobDescription" className="block text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+              <label htmlFor="jobDescription" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3 uppercase tracking-wide">
                 Descripción del Puesto
               </label>
               <textarea
@@ -119,7 +226,7 @@ function App() {
                 value={jobDescription}
                 onChange={(e) => setJobDescription(e.target.value)}
                 rows={10}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none transition-all text-gray-900 placeholder-gray-400 bg-gray-50 focus:bg-white"
+                className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:ring-2 focus:ring-slate-500 focus:border-slate-500 resize-none transition-all text-slate-900 placeholder-slate-400 bg-slate-50 focus:bg-white dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400 dark:focus:bg-slate-800"
                 placeholder="Ingrese la descripción detallada del puesto de trabajo..."
                 required
               />
@@ -128,7 +235,7 @@ function App() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-8 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-700 active:scale-95 active:shadow-md focus:outline-none focus:ring-4 focus:ring-indigo-300 transform hover:scale-[1.01] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none cursor-pointer"
+              className="w-full bg-slate-900 text-white py-4 px-8 rounded-xl font-semibold text-lg shadow-md hover:shadow-lg hover:bg-slate-800 active:scale-95 active:shadow-md focus:outline-none focus:ring-4 focus:ring-slate-300 transform hover:scale-[1.01] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none cursor-pointer dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:text-white dark:focus:ring-indigo-300"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -357,10 +464,10 @@ function App() {
         )}
 
         {/* Footer */}
-        <footer className="mt-16 pt-8 pb-6 border-t border-gray-200">
+        <footer className="mt-16 pt-8 pb-6 border-t border-gray-200 dark:border-slate-700">
           <div className="flex flex-col items-center gap-4">
-            <p className="text-sm text-gray-600">© Derechos reservados 2026</p>
-            <p className="text-sm text-gray-500">Desarrollado por Hernan Berrino</p>
+            <p className="text-sm text-gray-600 dark:text-slate-300">© Derechos reservados 2026</p>
+            <p className="text-sm text-gray-500 dark:text-slate-400">Desarrollado por Hernan Berrino</p>
             <div className="flex items-center gap-4">
               <a
                 href="https://www.linkedin.com/in/hernanberrino/"
